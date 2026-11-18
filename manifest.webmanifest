@@ -1,0 +1,11 @@
+{
+  "name": "AETHER NOVA Mobile Controller",
+  "short_name": "AETHER PAD",
+  "description": "Joystick inalámbrico para AETHER NOVA",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#040914",
+  "theme_color": "#050b18"
+}
