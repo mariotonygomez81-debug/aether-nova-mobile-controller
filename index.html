@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#050b18">
+<meta name="description" content="Joystick inalámbrico para AETHER NOVA. Controlá tu nave desde el celular.">
+<title>AETHER NOVA · Mobile Controller</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<style>
+:root{color-scheme:dark;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:#040914;color:#eaf7ff;--cyan:#53dcff;--muted:#8ba9c2;--panel:rgba(8,24,45,.88)}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;overscroll-behavior:none}body{min-height:100dvh;background:radial-gradient(ellipse at 50% -12%,#17446a 0%,#0a1c35 38%,#040914 78%);display:flex;justify-content:center;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+main{width:min(100%,680px);min-height:100dvh;padding:calc(16px + env(safe-area-inset-top)) 16px calc(18px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:14px}
+header{text-align:center;padding:8px 0 2px}header .eyebrow{font-size:10px;letter-spacing:.3em;color:var(--cyan);font-weight:800}h1{font-size:clamp(25px,7vw,38px);letter-spacing:.12em;margin:5px 0;background:linear-gradient(90deg,#fff,#69ddff 55%,#a7bfff);background-clip:text;color:transparent}header p{font-size:12px;color:#a4bdd1;margin:0}
+.panel{background:var(--panel);border:1px solid #3c91b555;border-radius:19px;padding:15px;box-shadow:0 14px 42px #0006,inset 0 1px #ffffff0c;backdrop-filter:blur(14px)}
+.connect{display:grid;grid-template-columns:1fr auto;gap:9px}input{width:100%;min-width:0;background:#030b18;border:1px solid #2b6588;border-radius:11px;color:white;padding:13px;font-size:19px;letter-spacing:.19em;text-align:center;text-transform:uppercase;outline:none}input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #53dcff20}
+button{font:inherit;border:1px solid #50c9f4;border-radius:12px;background:linear-gradient(135deg,#087da5,#174b9a);color:white;font-weight:850;letter-spacing:.07em;padding:12px 16px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible{outline:3px solid #fff;outline-offset:3px}
+#status{text-align:center;color:#a0b8cb;font-size:10px;letter-spacing:.12em;margin-top:11px;min-height:14px}.online{color:#68ffc5!important}
+#controls{display:none;flex:1;gap:14px;flex-direction:column;justify-content:space-between}
+.section-label{color:#77cde9;font-size:10px;letter-spacing:.2em;font-weight:800;text-align:center;margin-bottom:8px}
+.dpad{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;width:100%}
+.hold{height:clamp(110px,25vh,185px);font-size:clamp(30px,9vw,48px);background:linear-gradient(155deg,#164568,#08192e 72%);border:1px solid #4ab5dc88;box-shadow:inset 0 0 30px #26bfff18,0 9px 24px #0007;touch-action:none}
+.hold.active{background:linear-gradient(155deg,#078bb7,#124b91);box-shadow:0 0 30px #27caff66,inset 0 0 25px #fff2;transform:scale(.985)}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:center}
+.action{width:min(100%,158px);aspect-ratio:1;justify-self:center;border-radius:50%;height:auto;min-height:110px;font-size:clamp(12px,3.5vw,16px);background:radial-gradient(circle at 35% 25%,#f05d8c,#8b2058 65%,#3c1034);border-color:#ff8bb0;box-shadow:0 0 28px #ff4e9135,inset 0 0 22px #fff2;touch-action:none}
+.action.pause{background:radial-gradient(circle at 35% 25%,#43b6d8,#17416f 65%,#0a1c38);border-color:#75dfff;box-shadow:0 0 25px #42cfff28}
+.action.active{filter:brightness(1.3);transform:scale(.97)}
+.hint{text-align:center;color:#819bb1;font-size:10px;line-height:1.6}.disconnect{background:#142238;border-color:#42627d;color:#b9cde0;font-size:10px;padding:9px 12px}
+.hidden{display:none!important}
+@media(orientation:landscape) and (max-height:560px){main{width:min(100%,1050px);padding:8px 18px;gap:7px}header{display:flex;align-items:center;justify-content:space-between;text-align:left;padding:0}header p{display:none}h1{font-size:23px;margin:0}.eyebrow{margin-right:14px}#controls{flex-direction:row;align-items:center;gap:22px}.move-group{width:56%}.action-group{width:40%}.hold{height:32vh;min-height:92px}.action{height:27vh;min-height:88px;max-height:120px;width:auto}.hint{display:none}.section-label{margin-bottom:4px}}
+</style>
+</head>
+<body>
+<main>
+<header><div><div class="eyebrow">CONTROL REMOTO INALÁMBRICO</div><h1>AETHER NOVA</h1></div><p>Tu celular. Tu nave. Tu misión.</p></header>
+<section class="panel" id="join">
+<div class="connect"><input id="code" maxlength="12" inputmode="text" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false" placeholder="CÓDIGO DE 12 CARACTERES" aria-label="Código de vinculación"><button id="connect" type="button">VINCULAR</button></div>
+<div id="status" role="status" aria-live="polite">INGRESÁ EL CÓDIGO QUE MUESTRA LA PC</div>
+</section>
+<section id="controls">
+<div class="move-group"><div class="section-label">MOVIMIENTO DE LA NAVE</div><div class="dpad"><button class="hold" data-hold="left" aria-label="Mover a la izquierda">◀</button><button class="hold" data-hold="right" aria-label="Mover a la derecha">▶</button></div></div>
+<div class="action-group"><div class="section-label">SISTEMAS ESPECIALES</div><div class="actions"><button class="action" data-pulse="bomb">✦<br>SUPERNOVA</button><button class="action pause" data-pulse="pause">Ⅱ<br>PAUSA</button></div></div>
+<div class="hint">Mantené presionadas las flechas para mover la nave.<br>Los disparos principales continúan automáticamente.</div>
+<button class="disconnect" id="disconnect" type="button">DESCONECTAR MANDO</button>
+</section>
+</main>
+<script src="./config.js"></script>
+<script type="module">
+const statusEl=document.getElementById("status"),codeEl=document.getElementById("code"),join=document.getElementById("join"),controls=document.getElementById("controls");
+const input={l:false,r:false,b:false,p:false};let client=null,channel=null,connected=false,lastSent="";
+const setStatus=(s,ok=false)=>{statusEl.textContent=s;statusEl.classList.toggle("online",ok);};
+const fromUrl=new URLSearchParams(location.search).get("code");if(fromUrl)codeEl.value=fromUrl.toUpperCase().slice(0,12);
+function releaseAll(){input.l=input.r=input.b=input.p=false;document.querySelectorAll(".active").forEach(x=>x.classList.remove("active"));send(true);}
+async function send(force=false){if(!connected||!channel)return;const packed=JSON.stringify(input);if(!force&&packed===lastSent)return;lastSent=packed;try{await channel.send({type:"broadcast",event:"input",payload:{l:input.l,r:input.r,b:input.b,p:input.p,t:Date.now()}});}catch(e){console.warn("No se pudo enviar el control",e);}}
+async function disconnect(){releaseAll();connected=false;const old=channel;channel=null;if(client&&old){try{await client.removeChannel(old);}catch(e){}}client=null;controls.style.display="none";join.style.display="block";setStatus("MANDO DESCONECTADO");}
+async function connect(){try{if(connected)await disconnect();const cfg=window.AETHER_CLOUD_CONFIG;if(!cfg?.enabled||!cfg.supabaseUrl||!cfg.anonKey)throw new Error("Configuración online no disponible.");const code=codeEl.value.trim().toUpperCase();if(!/^[A-F0-9]{12}$/.test(code))throw new Error("El código debe tener exactamente 12 caracteres hexadecimales.");setStatus("CONECTANDO A LA PC…");const sdk=await import("https://esm.sh/@supabase/supabase-js@2");client=sdk.createClient(cfg.supabaseUrl,cfg.anonKey,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false},realtime:{params:{eventsPerSecond:25}}});channel=client.channel("aether-phone-"+code,{config:{private:false,broadcast:{ack:false,self:false}}});channel.subscribe(s=>{if(s==="SUBSCRIBED"){connected=true;join.style.display="none";controls.style.display="flex";setStatus("JOYSTICK CONECTADO · LISTO PARA JUGAR",true);send(true);}else if(s==="CHANNEL_ERROR"||s==="TIMED_OUT"){connected=false;setStatus("NO SE PUDO CONECTAR. REVISÁ EL CÓDIGO Y REALTIME.");}});}catch(e){setStatus(e.message||"ERROR DE CONEXIÓN");}}
+document.getElementById("connect").addEventListener("click",connect);codeEl.addEventListener("keydown",e=>{if(e.key==="Enter")connect();});document.getElementById("disconnect").addEventListener("click",disconnect);
+document.querySelectorAll("[data-hold]").forEach(btn=>{const key=btn.dataset.hold==="left"?"l":"r";const down=e=>{e.preventDefault();input[key]=true;btn.classList.add("active");try{btn.setPointerCapture(e.pointerId);}catch(_){}send(true);};const up=e=>{if(e)e.preventDefault();input[key]=false;btn.classList.remove("active");send(true);};btn.addEventListener("pointerdown",down);["pointerup","pointercancel","lostpointercapture","contextmenu"].forEach(t=>btn.addEventListener(t,up));});
+document.querySelectorAll("[data-pulse]").forEach(btn=>{const key=btn.dataset.pulse==="bomb"?"b":"p";btn.addEventListener("pointerdown",e=>{e.preventDefault();input[key]=true;btn.classList.add("active");send(true);});const up=e=>{if(e)e.preventDefault();input[key]=false;btn.classList.remove("active");send(true);};["pointerup","pointercancel","pointerleave","contextmenu"].forEach(t=>btn.addEventListener(t,up));});
+setInterval(()=>send(true),400);window.addEventListener("pagehide",()=>{input.l=input.r=input.b=input.p=false;send(true);});document.addEventListener("visibilitychange",()=>{if(document.hidden)releaseAll();});
+</script>
+</body></html>
