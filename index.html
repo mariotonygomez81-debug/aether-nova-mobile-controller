@@ -104,7 +104,8 @@ button{font:inherit;border:1px solid #50c9f4;border-radius:14px;background:linea
 <div class="statusbar">
 <div class="stat level"><small>SECTOR</small><strong id="level-count">--</strong></div>
 <div class="stat"><small>VIDAS</small><strong id="life-count">--</strong></div>
-<div class="stat"><small>ESTADO</small><strong style="font-size:12px;color:#6dffc9">ONLINE</strong></div>
+<div class="stat"><small>PUNTOS</small><strong id="score-count">--</strong></div>
+<div class="stat"><small>ESTADO</small><strong id="mode-count" style="font-size:10px;color:#6dffc9">ONLINE</strong></div>
 </div>
 <section class="panel flight-panel">
 <div class="section-label">CONTROL DE NAVEGACIÓN</div>
@@ -147,6 +148,8 @@ function renderInventory(data){
  latestStatus=data;
  document.getElementById("level-count").textContent=data.level??"--";
  document.getElementById("life-count").textContent=data.lives??"--";
+ document.getElementById("score-count").textContent=Number(data.score||0).toLocaleString("es-AR");
+ document.getElementById("mode-count").textContent=(data.mode||"ONLINE").replace("PLAYING","COMBATE").replace("PAUSED","PAUSA").slice(0,12);
  const bombBtn=document.getElementById("supernova-btn"),empBtn=document.getElementById("emp-btn");
  bombBtn.classList.toggle("empty",!(data.bombs>0));document.getElementById("bomb-count").textContent="×"+(data.bombs||0);
  empBtn.classList.toggle("empty",!(data.emp>0));document.getElementById("emp-count").textContent="×"+(data.emp||0);
