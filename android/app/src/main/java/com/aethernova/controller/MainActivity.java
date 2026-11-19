@@ -96,7 +96,8 @@ public class MainActivity extends Activity {
             if (result.getContents() != null) {
                 String code = extractCode(result.getContents());
                 if (code != null) {
-                    webView.loadUrl(CONTROLLER_URL + "?code=" + code);
+                    String player = extractPlayer(result.getContents());
+                    webView.loadUrl(CONTROLLER_URL + "?code=" + code + ("2".equals(player) ? "&player=2" : ""));
                     Toast.makeText(this, "Código detectado. Conectando joystick…", Toast.LENGTH_LONG).show();
                 } else Toast.makeText(this, "El QR no contiene un código válido de AETHER NOVA.", Toast.LENGTH_LONG).show();
             }
@@ -113,10 +114,16 @@ public class MainActivity extends Activity {
         return null;
     }
 
+    private String extractPlayer(String raw) {
+        try { return "2".equals(Uri.parse(raw).getQueryParameter("player")) ? "2" : "1"; }
+        catch (Exception ignored) { return "1"; }
+    }
+
     private String buildControllerUrl(Intent intent) {
         Uri data = intent != null ? intent.getData() : null;
         String code = data != null ? data.getQueryParameter("code") : null;
-        if (code != null && code.matches("(?i)[A-F0-9]{12}")) return CONTROLLER_URL + "?code=" + code.toUpperCase();
+        String player = data != null ? data.getQueryParameter("player") : null;
+        if (code != null && code.matches("(?i)[A-F0-9]{12}")) return CONTROLLER_URL + "?code=" + code.toUpperCase() + ("2".equals(player) ? "&player=2" : "");
         return CONTROLLER_URL;
     }
 
