@@ -114,6 +114,7 @@ button{font:inherit;border:1px solid #50c9f4;border-radius:14px;background:linea
  .inventory{right:clamp(76px,12vw,108px);width:112px;max-width:calc(100% - 150px);padding:4px}
 }
 
+.ship-choice{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:10px;margin-bottom:10px}.ship-choice label{font-size:9px;font-weight:900;letter-spacing:.14em;color:#8fdff5}.ship-choice select{min-width:0;background:#041225;color:#eaf7ff;border:1px solid #347da0;border-radius:10px;padding:10px;font:800 11px system-ui;letter-spacing:.04em;outline:none}.ship-choice select:focus{border-color:#55e4ff;box-shadow:0 0 0 2px #55e4ff22}
 </style>
 </head>
 <body>
@@ -130,6 +131,7 @@ button{font:inherit;border:1px solid #50c9f4;border-radius:14px;background:linea
 <div class="brand-copy"><div class="eyebrow">CENTRO DE MANDO · SISTEMA TÁCTICO</div><h1>AETHER NOVA</h1><p>Tu nave. Tu estrategia. Tu universo.</p></div>
 </header>
 <section class="panel" id="join">
+<div class="ship-choice"><label for="ship-choice">ELEGÍ TU NAVE</label><select id="ship-choice"><option value="valkyrie">VALKYRIE · EQUILIBRADA</option><option value="viper">VIPER · VELOZ</option><option value="titan">TITAN · PESADA</option><option value="wraith">WRAITH · SIGILO</option><option value="bastion">BASTION · BLINDADA</option><option value="phoenix">PHOENIX · ASALTO</option><option value="singularity">SINGULARITY · EXPERIMENTAL</option><option value="omega">OMEGA · AVANZADA</option></select></div>
 <div class="connect"><input id="code" maxlength="12" inputmode="text" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false" placeholder="CÓDIGO DE 12 CARACTERES" aria-label="Código de vinculación"><button class="primary" id="connect" type="button">VINCULAR</button></div>
 <div id="status" role="status" aria-live="polite">INGRESÁ EL CÓDIGO O ESCANEÁ EL QR DESDE LA APP</div>
 </section>
@@ -172,7 +174,7 @@ button{font:inherit;border:1px solid #50c9f4;border-radius:14px;background:linea
 const statusEl=document.getElementById("status"),liveStatus=document.getElementById("live-status"),codeEl=document.getElementById("code"),join=document.getElementById("join"),controls=document.getElementById("controls");
 const pilotId=new URLSearchParams(location.search).get("player")==="2"?2:1;
 if(pilotId===2){document.body.classList.add("player-two");document.querySelector(".eyebrow").textContent="CENTRO DE MANDO · PILOTO 2";document.querySelector(".brand-copy p").textContent="Nave de escolta · Operación cooperativa";document.getElementById("connect").textContent="VINCULAR P2";}
-const input={l:false,r:false,b:false,e:false,c:false,s:false,y:false,g:false,p:false};let client=null,channel=null,connected=false,lastSent="",latestStatus=null;
+const input={l:false,r:false,b:false,e:false,c:false,s:false,y:false,g:false,p:false};let client=null,channel=null,connected=false,lastSent="",latestStatus=null;const shipChoice=document.getElementById("ship-choice");const savedShip=localStorage.getItem("aether-ship-p"+pilotId);if(savedShip&&[...shipChoice.options].some(o=>o.value===savedShip))shipChoice.value=savedShip;
 const vibrate=(ms=12)=>{try{if(navigator.vibrate)navigator.vibrate(ms);}catch(_){}};
 async function requestLandscape(){try{if(screen.orientation?.lock)await screen.orientation.lock("landscape");}catch(_){/* El sistema puede requerir que el usuario gire el dispositivo. */}}
 const setStatus=(s,ok=false)=>{statusEl.textContent=s;statusEl.classList.toggle("online",ok);if(liveStatus){liveStatus.textContent=s;liveStatus.style.color=ok?"#68ffc5":"#ffcc8a";}};
@@ -195,7 +197,7 @@ function renderInventory(data){
  document.getElementById("buff-list").innerHTML=chips.length?chips.join(""):'<span class="chip empty">SIN MEJORAS TEMPORALES ACTIVAS</span>';
 }
 function releaseAll(){input.l=input.r=input.b=input.e=input.c=input.s=input.y=input.g=input.p=false;document.querySelectorAll(".active").forEach(x=>x.classList.remove("active"));send(true);}
-async function send(force=false){if(!connected||!channel)return;const packed=JSON.stringify(input);if(!force&&packed===lastSent)return;lastSent=packed;try{await channel.send({type:"broadcast",event:"input",payload:{l:input.l,r:input.r,b:input.b,e:input.e,c:input.c,s:input.s,y:input.y,g:input.g,p:input.p,t:Date.now()}});}catch(e){console.warn("No se pudo enviar el control",e);}}
+async function send(force=false){if(!connected||!channel)return;const packed=JSON.stringify({...input,ship:shipChoice.value});if(!force&&packed===lastSent)return;lastSent=packed;try{await channel.send({type:"broadcast",event:"input",payload:{l:input.l,r:input.r,b:input.b,e:input.e,c:input.c,s:input.s,y:input.y,g:input.g,p:input.p,ship:shipChoice.value,t:Date.now()}});}catch(e){console.warn("No se pudo enviar el control",e);}}
 async function disconnect(){releaseAll();connected=false;document.body.classList.remove("controller-connected");const old=channel;channel=null;if(client&&old){try{await client.removeChannel(old);}catch(e){}}client=null;controls.style.display="none";join.style.display="block";setStatus("MANDO DESCONECTADO");}
 async function connect(){try{if(connected)await disconnect();await requestLandscape();const cfg=window.AETHER_CLOUD_CONFIG;if(!cfg?.enabled||!cfg.supabaseUrl||!cfg.anonKey)throw new Error("Configuración online no disponible.");const code=codeEl.value.trim().toUpperCase();if(!/^[A-F0-9]{12}$/.test(code))throw new Error("El código debe tener exactamente 12 caracteres hexadecimales.");setStatus("CONECTANDO A LA PC…");const sdk=await import("https://esm.sh/@supabase/supabase-js@2");client=sdk.createClient(cfg.supabaseUrl,cfg.anonKey,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false},realtime:{params:{eventsPerSecond:25}}});channel=client.channel("aether-phone-"+code,{config:{private:false,broadcast:{ack:false,self:false}}});
 channel.on("broadcast",{event:"game-status"},({payload})=>{if(payload&&typeof payload==="object")renderInventory(payload);});
@@ -204,7 +206,7 @@ channel.subscribe(s=>{if(s==="SUBSCRIBED"){connected=true;document.body.classLis
 document.getElementById("connect").addEventListener("click",connect);codeEl.addEventListener("keydown",e=>{if(e.key==="Enter")connect();});document.getElementById("disconnect").addEventListener("click",disconnect);
 document.querySelectorAll("[data-hold]").forEach(btn=>{const key=btn.dataset.hold==="left"?"l":"r";const down=e=>{e.preventDefault();input[key]=true;btn.classList.add("active");vibrate(8);try{btn.setPointerCapture(e.pointerId);}catch(_){}send(true);};const up=e=>{if(e)e.preventDefault();input[key]=false;btn.classList.remove("active");send(true);};btn.addEventListener("pointerdown",down);["pointerup","pointercancel","lostpointercapture","contextmenu"].forEach(t=>btn.addEventListener(t,up));});
 document.querySelectorAll("[data-pulse]").forEach(btn=>{const key=({bomb:"b",emp:"e",cluster:"c",singularity:"s",cryo:"y",gravity:"g",pause:"p"})[btn.dataset.pulse];btn.addEventListener("pointerdown",e=>{e.preventDefault();if((key==="b"||key==="e"||key==="c"||key==="s"||key==="y"||key==="g")&&btn.classList.contains("empty"))return;input[key]=true;btn.classList.add("active");vibrate(key==="b"||key==="e"||key==="c"||key==="s"||key==="y"||key==="g"?24:8);send(true);});const up=e=>{if(e)e.preventDefault();input[key]=false;btn.classList.remove("active");send(true);};["pointerup","pointercancel","pointerleave","contextmenu"].forEach(t=>btn.addEventListener(t,up));});
-setInterval(()=>send(true),400);window.addEventListener("pagehide",()=>{input.l=input.r=input.b=input.e=input.c=input.s=input.y=input.g=input.p=false;send(true);});document.addEventListener("visibilitychange",()=>{if(document.hidden)releaseAll();});
+setInterval(()=>{if(input.l||input.r)send(true);},50);shipChoice.addEventListener("change",()=>{localStorage.setItem("aether-ship-p"+pilotId,shipChoice.value);send(true);setStatus("NAVE SELECCIONADA · "+shipChoice.selectedOptions[0].text,true);});window.addEventListener("pagehide",()=>{input.l=input.r=input.b=input.e=input.c=input.s=input.y=input.g=input.p=false;send(true);});document.addEventListener("visibilitychange",()=>{if(document.hidden)releaseAll();});
 if(fromUrl&&/^[A-F0-9]{12}$/i.test(fromUrl)){setStatus("CÓDIGO QR DETECTADO · CONECTANDO…");connect();}
 </script>
 </body></html>
