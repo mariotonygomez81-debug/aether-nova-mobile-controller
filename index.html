@@ -99,7 +99,7 @@ button{font:inherit;border:1px solid #50c9f4;border-radius:14px;background:linea
  .tactical-btn .glyph{font-size:clamp(19px,3.2vh,28px)}
  .tactical-btn small{font-size:clamp(6px,.8vw,8px)}
  .tactical-btn strong{font-size:12px}
- .inventory{position:absolute;z-index:3;top:5px;right:7px;width:clamp(116px,15vw,170px);min-width:0;max-height:36%;padding:7px;background:#06152ae8;backdrop-filter:blur(8px)}
+ .inventory{position:absolute;z-index:3;top:5px;right:clamp(84px,11vw,132px);width:clamp(116px,15vw,170px);min-width:0;max-width:calc(100% - clamp(170px,22vw,264px));max-height:36%;padding:7px;background:#06152ae8;backdrop-filter:blur(8px)}
  .inventory-head .section-label{font-size:7px}
  .chips{gap:3px}
  .chip{font-size:7px;padding:3px 5px}
@@ -111,7 +111,7 @@ button{font:inherit;border:1px solid #50c9f4;border-radius:14px;background:linea
  .tactical{width:clamp(270px,44vw,430px);max-width:58%;padding:4px}
  .tactical-btn{min-height:52px}
  .statusbar{left:clamp(76px,12vw,108px);width:55px}
- .inventory{width:112px;padding:4px}
+ .inventory{right:clamp(76px,12vw,108px);width:112px;max-width:calc(100% - 150px);padding:4px}
 }
 
 </style>
