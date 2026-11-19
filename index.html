@@ -26,6 +26,7 @@ button{font:inherit;border:1px solid #50c9f4;border-radius:14px;background:linea
 .footer-row{display:flex;justify-content:space-between;align-items:center;gap:8px}.live-status{text-align:center;color:#68ffc5;font-size:9px;font-weight:900;letter-spacing:.12em;padding:9px;border:1px solid #68ffc544;border-radius:10px;background:#68ffc50c;flex:1}.disconnect{background:#142238;border-color:#42627d;color:#b9cde0;font-size:9px;padding:9px 11px}.hint{text-align:center;color:#819bb1;font-size:9px;line-height:1.5}
 .hidden{display:none!important}
 @media(orientation:landscape) and (max-height:600px){main{width:min(100%,1100px);padding:7px 14px;gap:7px}header{justify-content:flex-start;padding:0}.brand-mark{width:40px;height:40px}.brand-copy h1{font-size:21px}.brand-copy p{display:none}#controls{display:none;display:flex;flex-direction:row;align-items:stretch;gap:10px;justify-content:center}.statusbar{display:flex;flex-direction:column;width:94px;justify-content:space-between}.stat{padding:5px}.stat strong{font-size:16px}.flight-panel{flex:1;display:flex;flex-direction:column;justify-content:center}.flight-controls{flex:1}.flight{height:29vh;min-height:80px;max-height:130px}.tactical{width:35%;display:flex;flex-direction:column;justify-content:center}.tactical-grid{grid-template-columns:repeat(3,1fr)}.tactical-btn{min-height:72px}.inventory{width:23%;display:flex;flex-direction:column;justify-content:center}.footer-row{width:100%;position:absolute;bottom:4px;left:0;padding:0 15px}.hint{display:none}}
+.player-two .brand-copy .eyebrow{color:#ffbd70}.player-two .flight{border-color:#ffbd70;background:radial-gradient(ellipse at 50% 20%,#a45a24,#40213a 72%)}.player-two .flight.active{background:radial-gradient(ellipse at 50% 20%,#ef9238,#87452b 72%)}.player-two .live-status{color:#ffbd70!important;border-color:#ffbd7066;background:#ffbd700c}
 @media(max-width:370px){main{padding-left:10px;padding-right:10px}.panel{padding:11px}.tactical-grid{gap:6px}.tactical-btn{min-height:82px}.tactical-btn small{font-size:7px}}
 </style>
 </head>
@@ -78,6 +79,8 @@ button{font:inherit;border:1px solid #50c9f4;border-radius:14px;background:linea
 <script src="./config.js"></script>
 <script type="module">
 const statusEl=document.getElementById("status"),liveStatus=document.getElementById("live-status"),codeEl=document.getElementById("code"),join=document.getElementById("join"),controls=document.getElementById("controls");
+const pilotId=new URLSearchParams(location.search).get("player")==="2"?2:1;
+if(pilotId===2){document.body.classList.add("player-two");document.querySelector(".eyebrow").textContent="CENTRO DE MANDO · PILOTO 2";document.querySelector(".brand-copy p").textContent="Nave de escolta · Operación cooperativa";document.getElementById("connect").textContent="VINCULAR P2";}
 const input={l:false,r:false,b:false,e:false,p:false};let client=null,channel=null,connected=false,lastSent="",latestStatus=null;
 const setStatus=(s,ok=false)=>{statusEl.textContent=s;statusEl.classList.toggle("online",ok);if(liveStatus){liveStatus.textContent=s;liveStatus.style.color=ok?"#68ffc5":"#ffcc8a";}};
 const fromUrl=new URLSearchParams(location.search).get("code");if(fromUrl)codeEl.value=fromUrl.toUpperCase().slice(0,12);
